@@ -1,16 +1,18 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-
-import { INavLink } from "@/types";
-import { sidebarLinks } from "@/constants";
+import { sidebarLinks, Storage } from "@/constants";
 import { Loader } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 // import { useSignOutAccount } from "@/lib/react-query/queries";
-import { useUserContext, INITIAL_USER } from "@/context/AuthContext";
+import { INavLink } from "@/types/nav";
+import { useAuthStore } from "@/store/auth";
+import { getStorage } from "@/utils/storage";
+import { IUser } from "@/types";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
+  const { isAuthenticated, setAuthStatus } = useAuthStore();
+  const user = getStorage<IUser>(Storage.user);
 
   // const { mutate: signOut } = useSignOutAccount();
 
@@ -19,8 +21,7 @@ const LeftSidebar = () => {
   ) => {
     e.preventDefault();
     // signOut();
-    setIsAuthenticated(false);
-    setUser(INITIAL_USER);
+    setAuthStatus({ isAuthenticated: false });
     navigate("/sign-in");
   };
 
@@ -35,24 +36,16 @@ const LeftSidebar = () => {
             height={36}
           />
         </Link>
-
-        {isLoading || !user.email ? (
-          <div className="h-14">
-            <Loader />
+        <Link to={`/profile/${user?.id}`} className="flex gap-3 items-center">
+          {/* <img
+            src={user? .imageUrl || "/assets/icons/profile-placeholder.svg"}
+            alt="profile"
+            className="h-14 w-14 rounded-full"
+          /> */}
+          <div className="flex flex-col">
+            <p className="small-regular text-light-3">@{user?.username}</p>
           </div>
-        ) : (
-          <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
-            <img
-              src={user.imageUrl || "/assets/icons/profile-placeholder.svg"}
-              alt="profile"
-              className="h-14 w-14 rounded-full"
-            />
-            <div className="flex flex-col">
-              <p className="body-bold">{user.name}</p>
-              <p className="small-regular text-light-3">@{user.username}</p>
-            </div>
-          </Link>
-        )}
+        </Link>
 
         <ul className="flex flex-col gap-6">
           {sidebarLinks.map((link: INavLink) => {

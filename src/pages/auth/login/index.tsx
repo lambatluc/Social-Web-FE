@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   Form,
@@ -13,42 +13,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Loader from "@/components/shared/Loader";
-import { useToast } from "@/components/ui/use-toast";
-
-import { SigninValidation } from "@/lib/validation";
-import { useSignInAccount } from "@/lib/react-query/queries";
-import { useUserContext } from "@/context/AuthContext";
+import { useLogin } from "./hooks/useLogin";
+import { LoginSchema, loginSchema } from "./schema";
+import { ILogin } from "@/types/auth";
+import toast from "react-hot-toast";
 
 const SigninForm = () => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
-
-  // Query
-  const { mutateAsync: signInAccount, isLoading } = useSignInAccount();
-
-  const form = useForm<z.infer<typeof SigninValidation>>({
-    resolver: zodResolver(SigninValidation),
+  const { mutateAsync: login, isLoading } = useLogin();
+  const form = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
+  const { errors } = form.formState;
 
-  const handleSignin = async (user: z.infer<typeof SigninValidation>) => {
-    // const session = await signInAccount(user);
-
-    // if (!session) {
-    // toast({ title: "Login failed. Please try again." });
-
-    // return;
-    // }
-
-    // const isLoggedIn = await checkAuthUser();
-    form.reset();
-
-    navigate("/");
+  const handleSignin = async () => {
+    const isValid = await form.trigger();
+    if (!isValid) return;
+    await login(form.getValues(), {
+      onError: (error) => {
+        if (error.errors) {
+          Object.entries(error.errors).forEach(([key, value]) => {
+            form.setError(key as keyof ILogin, {
+              message: value,
+            });
+          });
+        }
+        toast.error("Vui lòng kiểm tra lại thông tin đăng nhập");
+      },
+    });
   };
 
   return (
@@ -72,7 +67,7 @@ const SigninForm = () => {
               <FormItem>
                 <FormLabel className="shad-form_label">Email</FormLabel>
                 <FormControl>
-                  <Input type="text" className="shad-input" {...field} />
+                  <Input isError={!!errors.email} type="text" className="shad-input" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -92,15 +87,11 @@ const SigninForm = () => {
               </FormItem>
             )}
           />
-
-          <Button type="submit" className="shad-button_primary">
-            {isLoading || isUserLoading ? (
-              <div className="flex-center gap-2">
-                <Loader /> Loading...
-              </div>
-            ) : (
-              "Log in"
-            )}
+          <Button
+            type="submit"
+            className="shad-button_primary"
+            isLoading={isLoading}>
+            Log in
           </Button>
 
           <p className="text-small-regular text-light-2 text-center mt-2">

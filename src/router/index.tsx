@@ -13,8 +13,8 @@ import {
 } from "@/pages/root";
 import AuthLayout from "@/layouts/AuthLayout";
 import RootLayout from "@/layouts/RootLayout";
-import SignupForm from "@/pages/auth/SignupForm";
-import SigninForm from "@/pages/auth/SigninForm";
+import SignupForm from "@/pages/auth/signup";
+import SigninForm from "@/pages/auth/login";
 
 export const AppRouter = () => {
   return (

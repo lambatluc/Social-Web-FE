@@ -1,17 +1,8 @@
 import {
-  Route,
-  Routes,
-  Link,
-  Outlet,
   useParams,
   useLocation,
 } from "react-router-dom";
-
-import { Button } from "@/components/ui";
-import { LikedPosts } from "@/pages/root";
-import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queries";
-import { GridPostList, Loader } from "@/components/shared";
+import { Loader } from "@/components/shared";
 
 interface StabBlockProps {
   value: string | number;
@@ -27,7 +18,6 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
 
 const Profile = () => {
   const { id } = useParams();
-  const { user } = useUserContext();
   const { pathname } = useLocation();
 
   // const { data: currentUser } = useGetUserById(id || "");

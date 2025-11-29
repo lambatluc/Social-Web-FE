@@ -1,14 +1,18 @@
-import { Toaster } from "@/components/ui/toaster";
 import { AppRouter } from "@/router";
+import { Toaster } from 'react-hot-toast';
 
 import "./globals.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <main className="flex h-screen">
-      <AppRouter />
-      <Toaster />
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <main className="flex h-screen">
+        <AppRouter />
+        <Toaster/>
+      </main>
+    </QueryClientProvider>
   );
 };
 

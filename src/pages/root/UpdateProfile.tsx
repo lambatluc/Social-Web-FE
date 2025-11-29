@@ -11,27 +11,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
 import { Textarea, Input, Button } from "@/components/ui";
 import { ProfileUploader, Loader } from "@/components/shared";
 
 import { ProfileValidation } from "@/lib/validation";
-import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById, useUpdateUser } from "@/lib/react-query/queries";
+import { getStorage } from "@/utils/storage";
+import { IUser } from "@/types";
+import { Storage } from "@/constants";
 
 const UpdateProfile = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { id } = useParams();
-  const { user, setUser } = useUserContext();
+  const user = getStorage<IUser>(Storage.user);
   const form = useForm<z.infer<typeof ProfileValidation>>({
     resolver: zodResolver(ProfileValidation),
     defaultValues: {
       file: [],
-      name: user.name,
-      username: user.username,
-      email: user.email,
-      bio: user.bio || "",
+      username: user?.username,
+      email: user?.email,
     },
   });
 
