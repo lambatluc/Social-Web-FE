@@ -15,27 +15,104 @@ import AuthLayout from "@/layouts/AuthLayout";
 import RootLayout from "@/layouts/RootLayout";
 import SignupForm from "@/pages/auth/signup";
 import SigninForm from "@/pages/auth/login";
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
+import { PublicRoute } from "@/components/shared/PublicRoute";
 
 export const AppRouter = () => {
   return (
     <Routes>
-      {/* public routes */}
       <Route element={<AuthLayout />}>
-        <Route path="/sign-in" element={<SigninForm />} />
-        <Route path="/sign-up" element={<SignupForm />} />
+        <Route
+          path="/sign-in"
+          element={
+            <PublicRoute>
+              <SigninForm />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={
+            <PublicRoute>
+              <SignupForm />
+            </PublicRoute>
+          }
+        />
       </Route>
 
-      {/* private routes */}
       <Route element={<RootLayout />}>
-        <Route index element={<Home />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/saved" element={<Saved />} />
-        <Route path="/all-users" element={<AllUsers />} />
-        <Route path="/create-post" element={<CreatePost />} />
-        <Route path="/update-post/:id" element={<EditPost />} />
-        <Route path="/posts/:id" element={<PostDetails />} />
-        <Route path="/profile/:id/*" element={<Profile />} />
-        <Route path="/update-profile/:id" element={<UpdateProfile />} />
+        <Route
+          index
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/explore"
+          element={
+            <ProtectedRoute>
+              <Explore />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved"
+          element={
+            <ProtectedRoute>
+              <Saved />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/all-users"
+          element={
+            <ProtectedRoute>
+              <AllUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/update-post/:id"
+          element={
+            <ProtectedRoute>
+              <EditPost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/posts/:id"
+          element={
+            <ProtectedRoute>
+              <PostDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/:id/*"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/update-profile/:id"
+          element={
+            <ProtectedRoute>
+              <UpdateProfile />
+            </ProtectedRoute>
+          }
+        />
       </Route>
     </Routes>
   );

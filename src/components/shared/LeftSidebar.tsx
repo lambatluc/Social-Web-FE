@@ -1,27 +1,24 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { sidebarLinks, Storage } from "@/constants";
-import { Loader } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 // import { useSignOutAccount } from "@/lib/react-query/queries";
 import { INavLink } from "@/types/nav";
 import { useAuthStore } from "@/store/auth";
-import { getStorage } from "@/utils/storage";
+import { clearStorage, getStorage } from "@/utils/storage";
 import { IUser } from "@/types";
 
 const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { isAuthenticated, setAuthStatus } = useAuthStore();
+  const { setAuthStatus } = useAuthStore();
   const user = getStorage<IUser>(Storage.user);
-
-  // const { mutate: signOut } = useSignOutAccount();
 
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    // signOut();
     setAuthStatus({ isAuthenticated: false });
+    clearStorage();
     navigate("/sign-in");
   };
 

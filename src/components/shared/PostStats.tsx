@@ -1,26 +1,22 @@
-import { Models } from "appwrite";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import { checkIsLiked } from "@/lib/cn";
-import {
-  useLikePost,
-  useSavePost,
-  useDeleteSavedPost,
-  useGetCurrentUser,
-} from "@/lib/react-query/queries";
+import { IPost } from "@/types";
+import { useLikePost } from "./PostStats/hooks/useLikePost";
+import { useUnlikePost } from "./PostStats/hooks/useUnlikePost";
 
 type PostStatsProps = {
-  post: Models.Document;
-  userId: string;
+  post: IPost;
 };
 
-const PostStats = ({ post, userId }: PostStatsProps) => {
+const PostStats = ({ post }: PostStatsProps) => {
   const location = useLocation();
-  const likesList = post.likes.map((user: Models.Document) => user.$id);
-
-  const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
+  const { mutate: likePost } = useLikePost(post.id);
+  const { mutate: unlikePost } = useUnlikePost(post.id);
+  const [isLiked, setIsLiked] = useState(post.isLiked);
+
+  const [like, setLike] = useState(post.likes);
 
   // const { mutate: likePost } = useLikePost();
   // const { mutate: savePost } = useSavePost();
@@ -40,17 +36,18 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     e: React.MouseEvent<HTMLImageElement, MouseEvent>
   ) => {
     e.stopPropagation();
+    setIsLiked(true);
+    setLike((prev) => prev + 1);
+    likePost();
+  };
 
-    let likesArray = [...likes];
-
-    if (likesArray.includes(userId)) {
-      likesArray = likesArray.filter((Id) => Id !== userId);
-    } else {
-      likesArray.push(userId);
-    }
-
-    setLikes(likesArray);
-    // likePost({ postId: post.$id, likesArray });
+  const handleUnlikePost = (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+    setIsLiked(false);
+    setLike((prev) => prev - 1);
+    unlikePost();
   };
 
   const handleSavePost = (
@@ -77,17 +74,15 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       <div className="flex gap-2 mr-5">
         <img
           src={`${
-            checkIsLiked(likes, userId)
-              ? "/assets/icons/liked.svg"
-              : "/assets/icons/like.svg"
+            isLiked ? "/assets/icons/liked.svg" : "/assets/icons/like.svg"
           }`}
           alt="like"
           width={20}
           height={20}
-          onClick={(e) => handleLikePost(e)}
+          onClick={(e) => (isLiked ? handleUnlikePost(e) : handleLikePost(e))}
           className="cursor-pointer"
         />
-        <p className="small-medium lg:base-medium">{likes.length}</p>
+        <p className="small-medium lg:base-medium">{like}</p>
       </div>
 
       <div className="flex gap-2">

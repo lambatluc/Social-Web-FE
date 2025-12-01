@@ -12,8 +12,8 @@ export const useLogin = () => {
   const { setAuthStatus } = useAuthStore();
   return useMutation<ILoginResponse, ApiError<ILogin>, ILogin>({
     mutationFn: login,
-    onSuccess: ({ access_token, refresh_token, user }) => {
-      setStorage(Storage.token, { access_token, refresh_token });
+    onSuccess: ({ tokens, user }) => {
+      setStorage(Storage.token, tokens);
       setStorage(Storage.user, user);
 
       setAuthStatus({ isAuthenticated: true });
